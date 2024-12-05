@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_list/app/views/splashpage.dart';
+import 'package:todo_list/app/views/splash/splash_page.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
     const textColor = Color(0xFF4A4A4A);
     const background = Color(0xFFF5F5F5);
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Todo List',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: primary),
         scaffoldBackgroundColor: background,
