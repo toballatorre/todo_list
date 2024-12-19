@@ -3,17 +3,36 @@ import 'package:todo_list/app/model/task.dart';
 import 'package:todo_list/app/views/components/h1.dart';
 import 'package:todo_list/app/views/components/shape.dart';
 
-class TaskListPage extends StatelessWidget {
+class TaskListPage extends StatefulWidget {
   const TaskListPage({super.key});
+
+  @override
+  State<TaskListPage> createState() => _TaskListPageState();
+}
+
+class _TaskListPageState extends State<TaskListPage> {
+  final tasklist = <Task>[
+    Task('Cocinar cena'),
+    Task('Cortar pasto'),
+    Task('Regar pasto'),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const Column(
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _Header(),
-          Expanded(child: _TaskList()),
+          const _Header(),
+          Expanded(
+            child: _TaskList(
+              tasklist,
+              onTaskDoneChanged: (task) {
+                task.done = !task.done;
+                setState(() {});
+              },
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -32,7 +51,8 @@ class TaskListPage extends StatelessWidget {
       context: context,
       builder: (context) => _NewTaskModal(
         onTaskCreated: (task) {
-          print(task.title);
+          tasklist.add(task);
+          setState(() {});
         },
       ),
     );
@@ -86,18 +106,11 @@ class _NewTaskModal extends StatelessWidget {
   }
 }
 
-class _TaskList extends StatefulWidget {
-  const _TaskList();
+class _TaskList extends StatelessWidget {
+  const _TaskList(this.tasklist, {required this.onTaskDoneChanged});
 
-  @override
-  State<_TaskList> createState() => _TaskListState();
-}
-
-class _TaskListState extends State<_TaskList> {
-  final tasklist = List<Task>.generate(
-    10,
-    (index) => Task('Task: $index'),
-  );
+  final List<Task> tasklist;
+  final void Function(Task task) onTaskDoneChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -113,40 +126,10 @@ class _TaskListState extends State<_TaskList> {
               separatorBuilder: (_, __) => const SizedBox(height: 16),
               itemBuilder: (_, index) => _TaskItem(
                 tasklist[index],
-                onTap: () {
-                  tasklist[index].done = !tasklist[index].done;
-                  setState(() {});
-                },
+                onTap: () => onTaskDoneChanged(tasklist[index]),
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: Theme.of(context).colorScheme.primary,
-      child: Column(
-        children: [
-          const Row(children: [Shape()]),
-          Image.asset(
-            'assets/img/tasks-list-image.png',
-            width: 120,
-            height: 120,
-          ),
-          const SizedBox(height: 16),
-          const H1(
-            'Completa tus tareas',
-            color: Colors.white,
-          )
         ],
       ),
     );
@@ -177,6 +160,33 @@ class _TaskItem extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      color: Theme.of(context).colorScheme.primary,
+      child: Column(
+        children: [
+          const Row(children: [Shape()]),
+          Image.asset(
+            'assets/img/tasks-list-image.png',
+            width: 120,
+            height: 120,
+          ),
+          const SizedBox(height: 16),
+          const H1(
+            'Completa tus tareas',
+            color: Colors.white,
+          )
+        ],
       ),
     );
   }
