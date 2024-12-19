@@ -11,14 +11,62 @@ class TaskListPage extends StatelessWidget {
     return Scaffold(
       body: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [_Header(), Expanded(child: _TaskList())],
+        children: [
+          _Header(),
+          Expanded(child: _TaskList()),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => _showNewTaskModal(context),
         child: const Icon(
           Icons.add,
           size: 50,
         ),
+      ),
+    );
+  }
+
+  void _showNewTaskModal(BuildContext context) {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) => const _NewTaskModal(),
+    );
+  }
+}
+
+class _NewTaskModal extends StatelessWidget {
+  const _NewTaskModal();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(21)),
+        color: Colors.white,
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 33, horizontal: 23),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const H1('Nueva Tarea'),
+          const SizedBox(height: 26),
+          TextField(
+            decoration: InputDecoration(
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+              filled: true,
+              fillColor: Colors.white,
+              hintText: 'Descripción de la tarea',
+            ),
+          ),
+          const SizedBox(height: 26),
+          ElevatedButton(
+            onPressed: () {},
+            child: const Text('Guardar'),
+          )
+        ],
       ),
     );
   }
