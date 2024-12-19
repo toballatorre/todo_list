@@ -30,13 +30,20 @@ class TaskListPage extends StatelessWidget {
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
-      builder: (context) => const _NewTaskModal(),
+      builder: (context) => _NewTaskModal(
+        onTaskCreated: (task) {
+          print(task.title);
+        },
+      ),
     );
   }
 }
 
 class _NewTaskModal extends StatelessWidget {
-  const _NewTaskModal();
+  _NewTaskModal({required this.onTaskCreated});
+
+  final _controller = TextEditingController();
+  final void Function(Task task) onTaskCreated;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +60,7 @@ class _NewTaskModal extends StatelessWidget {
           const H1('Nueva Tarea'),
           const SizedBox(height: 26),
           TextField(
+            controller: _controller,
             decoration: InputDecoration(
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
@@ -63,7 +71,13 @@ class _NewTaskModal extends StatelessWidget {
           ),
           const SizedBox(height: 26),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              if (_controller.text.isNotEmpty) {
+                final task = Task(_controller.text);
+                Navigator.of(context).pop();
+                onTaskCreated(task);
+              }
+            },
             child: const Text('Guardar'),
           )
         ],
