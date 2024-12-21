@@ -11,11 +11,7 @@ class TaskListPage extends StatefulWidget {
 }
 
 class _TaskListPageState extends State<TaskListPage> {
-  final tasklist = <Task>[
-    Task('Cocinar cena'),
-    Task('Cortar pasto'),
-    Task('Regar pasto'),
-  ];
+  final tasklist = <Task>[];
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +47,9 @@ class _TaskListPageState extends State<TaskListPage> {
       context: context,
       builder: (context) => _NewTaskModal(
         onTaskCreated: (task) {
-          tasklist.add(task);
-          setState(() {});
+          setState(() {
+            tasklist.add(task);
+          });
         },
       ),
     );
