@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_list/app/views/components/h1.dart';
 import 'package:todo_list/app/views/components/shape.dart';
 import 'package:todo_list/app/views/task_list/task_list_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
@@ -41,9 +42,23 @@ class SplashPage extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 21),
+            Center(
+              child: TextButton(
+                onPressed: _launchUrl,
+                child: Text('Terms of Service'),
+              ),
+            )
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _launchUrl() async {
+    final url = Uri.parse('https://docs.flutter.dev/tos');
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }
   }
 }
