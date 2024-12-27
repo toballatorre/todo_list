@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/app/model/task.dart';
+import 'package:todo_list/app/reposotory/task_repository.dart';
 import 'package:todo_list/app/views/components/h1.dart';
 import 'package:todo_list/app/views/components/shape.dart';
 
@@ -12,6 +13,7 @@ class TaskListPage extends StatefulWidget {
 
 class _TaskListPageState extends State<TaskListPage> {
   final tasklist = <Task>[];
+  final TaskRepository taskRepository = TaskRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -21,22 +23,50 @@ class _TaskListPageState extends State<TaskListPage> {
         children: [
           const _Header(),
           Expanded(
-            child: _TaskList(
-              tasklist,
-              onTaskDoneChanged: (task) {
-                task.done = !task.done;
-                setState(() {});
-              },
-            ),
+            child: FutureBuilder<List<Task>>(
+                future: taskRepository.getTasks(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No existen tareas disponibles'));
+                  }
+                  return _TaskList(
+                    snapshot.data!,
+                    onTaskDoneChanged: (task) {
+                      task.done = !task.done;
+                      taskRepository.saveTasks(snapshot.data!);
+                      setState(() {});
+                    },
+                  );
+                }),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showNewTaskModal(context),
-        child: const Icon(
-          Icons.add,
-          size: 50,
-        ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            onPressed: () => _showNewTaskModal(context),
+            child: const Icon(
+              Icons.add,
+              size: 30,
+            ),
+          ),
+          SizedBox(width: 16),
+          FloatingActionButton(
+            onPressed: () {
+              taskRepository.deleteAllTasks();
+              setState(() {});
+            },
+            child: const Icon(
+              Icons.delete_forever,
+              size: 30,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -48,7 +78,7 @@ class _TaskListPageState extends State<TaskListPage> {
       builder: (context) => _NewTaskModal(
         onTaskCreated: (task) {
           setState(() {
-            tasklist.add(task);
+            taskRepository.addTask(task);
           });
         },
       ),
