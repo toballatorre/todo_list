@@ -149,9 +149,12 @@ class _FormNewTask extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               if (_keyForm.currentState!.validate()) {
-                final detailTask = TaskDetail(
-                    subtitle: _controllerSubTitle.text,
-                    description: _controllerDescription.text);
+                final detailTask = (_controllerSubTitle.text.isNotEmpty ||
+                        _controllerDescription.text.isNotEmpty)
+                    ? TaskDetail(
+                        subtitle: _controllerSubTitle.text,
+                        description: _controllerDescription.text)
+                    : null;
                 final task =
                     Task(_controllerTitle.text, taskDetail: detailTask);
                 onTaskCreated(task);
@@ -225,19 +228,23 @@ class _TaskItem extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     task.taskDetail != null
-                        ? Text(
-                            task.taskDetail!.subtitle,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(fontStyle: FontStyle.italic),
-                          )
+                        ? task.taskDetail!.subtitle.isEmpty
+                            ? Container()
+                            : Text(
+                                task.taskDetail!.subtitle,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(fontStyle: FontStyle.italic),
+                              )
                         : Container(),
                     task.taskDetail != null
-                        ? Text(
-                            task.taskDetail!.description,
-                            softWrap: true,
-                          )
+                        ? task.taskDetail!.description.isEmpty
+                            ? Container()
+                            : Text(
+                                task.taskDetail!.description,
+                                softWrap: true,
+                              )
                         : Container(),
                   ],
                 ),
