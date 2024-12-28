@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/app/model/task.dart';
-import 'package:todo_list/app/reposotory/task_repository.dart';
+import 'package:todo_list/app/repository/task_repository.dart';
 import 'package:todo_list/app/views/components/h1.dart';
 import 'package:todo_list/app/views/components/shape.dart';
 
@@ -44,29 +44,12 @@ class _TaskListPageState extends State<TaskListPage> {
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton(
-            onPressed: () => _showNewTaskModal(context),
-            child: const Icon(
-              Icons.add,
-              size: 30,
-            ),
-          ),
-          SizedBox(width: 16),
-          FloatingActionButton(
-            onPressed: () {
-              taskRepository.deleteAllTasks();
-              setState(() {});
-            },
-            child: const Icon(
-              Icons.delete_forever,
-              size: 30,
-            ),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showNewTaskModal(context),
+        child: const Icon(
+          Icons.add,
+          size: 30,
+        ),
       ),
     );
   }
@@ -87,9 +70,8 @@ class _TaskListPageState extends State<TaskListPage> {
 }
 
 class _NewTaskModal extends StatelessWidget {
-  _NewTaskModal({required this.onTaskCreated});
+  const _NewTaskModal({required this.onTaskCreated});
 
-  final _controller = TextEditingController();
   final void Function(Task task) onTaskCreated;
 
   @override
@@ -100,14 +82,61 @@ class _NewTaskModal extends StatelessWidget {
         color: Colors.white,
       ),
       padding: const EdgeInsets.symmetric(vertical: 33, horizontal: 23),
+      child: _FormNewTask(onTaskCreated: onTaskCreated),
+    );
+  }
+}
+
+class _FormNewTask extends StatelessWidget {
+  _FormNewTask({
+    required this.onTaskCreated,
+  });
+
+  final void Function(Task task) onTaskCreated;
+  final _keyForm = GlobalKey<FormState>();
+  final _controllerTitle = TextEditingController();
+  final _controllerSubTitle = TextEditingController();
+  final _controllerDescription = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _keyForm,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           const H1('Nueva Tarea'),
           const SizedBox(height: 26),
-          TextField(
-            controller: _controller,
+          TextFormField(
+            controller: _controllerTitle,
+            decoration: InputDecoration(
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+              filled: true,
+              fillColor: Colors.white,
+              hintText: 'Título de la tarea',
+            ),
+            validator: (value) {
+              return (value == null || value.isEmpty)
+                  ? 'Debe ingresar un título'
+                  : null;
+            },
+          ),
+          const SizedBox(height: 26),
+          TextFormField(
+            controller: _controllerSubTitle,
+            decoration: InputDecoration(
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+              filled: true,
+              fillColor: Colors.white,
+              hintText: 'Sub-Título de la tarea',
+            ),
+          ),
+          const SizedBox(height: 26),
+          TextFormField(
+            controller: _controllerDescription,
             decoration: InputDecoration(
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
@@ -119,10 +148,14 @@ class _NewTaskModal extends StatelessWidget {
           const SizedBox(height: 26),
           ElevatedButton(
             onPressed: () {
-              if (_controller.text.isNotEmpty) {
-                final task = Task(_controller.text);
-                Navigator.of(context).pop();
+              if (_keyForm.currentState!.validate()) {
+                final detailTask = TaskDetail(
+                    subtitle: _controllerSubTitle.text,
+                    description: _controllerDescription.text);
+                final task =
+                    Task(_controllerTitle.text, taskDetail: detailTask);
                 onTaskCreated(task);
+                Navigator.of(context).pop();
               }
             },
             child: const Text('Guardar'),
@@ -183,7 +216,32 @@ class _TaskItem extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(width: 10),
-              Text(task.title),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      task.title,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    task.taskDetail != null
+                        ? Text(
+                            task.taskDetail!.subtitle,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(fontStyle: FontStyle.italic),
+                          )
+                        : Container(),
+                    task.taskDetail != null
+                        ? Text(
+                            task.taskDetail!.description,
+                            softWrap: true,
+                          )
+                        : Container(),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
