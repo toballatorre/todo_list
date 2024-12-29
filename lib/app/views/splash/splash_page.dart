@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/app/views/components/h1.dart';
 import 'package:todo_list/app/views/components/shape.dart';
-import 'package:todo_list/app/views/task_list/task_list_page.dart';
+import 'package:todo_list/app/views/state_page/state_page.dart';
+// import 'package:todo_list/app/views/task_list/task_list_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SplashPage extends StatelessWidget {
@@ -30,7 +31,7 @@ class SplashPage extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const TaskListPage(),
+                    builder: (context) => const StatePage(),
                   ),
                 );
               },
