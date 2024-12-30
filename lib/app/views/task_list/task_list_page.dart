@@ -20,11 +20,13 @@ class TaskListPage extends StatelessWidget {
             Expanded(child: _TaskList()),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showNewTaskModal(context),
-          child: const Icon(
-            Icons.add,
-            size: 30,
+        floatingActionButton: Builder(
+          builder: (context) => FloatingActionButton(
+            onPressed: () => _showNewTaskModal(context),
+            child: const Icon(
+              Icons.add,
+              size: 30,
+            ),
           ),
         ),
       ),
@@ -35,17 +37,16 @@ class TaskListPage extends StatelessWidget {
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
-      builder: (context) => _NewTaskModal(
-        onTaskCreated: (task) {},
+      builder: (_) => ChangeNotifierProvider.value(
+        value: context.read<TaskProvider>(),
+        child: _NewTaskModal(),
       ),
     );
   }
 }
 
 class _NewTaskModal extends StatelessWidget {
-  const _NewTaskModal({required this.onTaskCreated});
-
-  final void Function(Task task) onTaskCreated;
+  const _NewTaskModal();
 
   @override
   Widget build(BuildContext context) {
@@ -55,17 +56,14 @@ class _NewTaskModal extends StatelessWidget {
         color: Colors.white,
       ),
       padding: const EdgeInsets.symmetric(vertical: 33, horizontal: 23),
-      child: _FormNewTask(onTaskCreated: onTaskCreated),
+      child: _FormNewTask(),
     );
   }
 }
 
 class _FormNewTask extends StatelessWidget {
-  _FormNewTask({
-    required this.onTaskCreated,
-  });
+  _FormNewTask();
 
-  final void Function(Task task) onTaskCreated;
   final _keyForm = GlobalKey<FormState>();
   final _controllerTitle = TextEditingController();
   final _controllerSubTitle = TextEditingController();
@@ -130,7 +128,7 @@ class _FormNewTask extends StatelessWidget {
                     : null;
                 final task =
                     Task(_controllerTitle.text, taskDetail: detailTask);
-                onTaskCreated(task);
+                context.read<TaskProvider>().addNewTask(task);
                 Navigator.of(context).pop();
               }
             },

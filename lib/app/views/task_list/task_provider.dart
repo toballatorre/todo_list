@@ -18,4 +18,9 @@ class TaskProvider extends ChangeNotifier {
     _taskRepository.saveTasks(_taskList);
     notifyListeners();
   }
+
+  void addNewTask(Task task) {
+    _taskRepository.addTask(task);
+    fetchTask();
+  }
 }
